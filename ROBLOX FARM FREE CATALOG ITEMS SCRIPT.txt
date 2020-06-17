@@ -1,0 +1,25 @@
+while wait() do
+   local category = 3 --category id
+   local wait = 10 --rate limit (seconds)
+   local link
+   local anal
+   if cur ~= nil  then
+       link = "https://catalog.roblox.com/v1/search/items/details?Category="..category.."&MaxPrice=0&Limit=30&Cursor="..cur
+       wait(wait)
+       anal = game:service("HttpService"):JSONDecode(game:HttpGet(link))
+   else
+       link = "https://catalog.roblox.com/v1/search/items/details?Category="..category.."&MaxPrice=0&Limit=30"
+       anal = game:service("HttpService"):JSONDecode(game:HttpGet(link))
+   end
+   for i = 1, #anal.data do
+       if  game:GetService("MarketplaceService"):PlayerOwnsAsset(game.Players.LocalPlayer, anal.data[i].id) ~= true then
+           game:GetService("MarketplaceService"):promptPurchase(game.Players.LocalPlayer, anal.data[i].id)
+           print(i)
+           wait(1)
+           repeat
+               wait()
+           until game:GetService("CoreGui").PurchasePromptApp.PurchasePromptUI:FindFirstChild("PromptContents") == nil
+       end
+   end
+   cur = tostring(anal.nextPageCursor)
+end
